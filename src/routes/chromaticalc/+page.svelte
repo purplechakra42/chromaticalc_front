@@ -21,10 +21,11 @@
   import { Colours } from '$lib/logic/colours.svelte';
   const colours = new Colours()
   import { Requirements } from '$lib/logic/requirements.svelte';
-  const requirements = new Requirements(null,null,293)
+  const requirements = new Requirements()
   let corrupted = $state(false)
 
   let ready = $derived(checkAllRequirements(colours, requirements))
+  let showUWInfo = $state(false)
   let showChromatic = $state(false)
   let showJeweller = $state(false)
   
@@ -111,7 +112,7 @@
     <!-- <button class="border-red-950 border rounded-md col-span-3" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted">
       <Icon itemIdentifier="vaal" variant="inline" />
     </button> -->
-    <button class="rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
+    <button class="rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
 
     {#each requirements.allProb as chance}
       <p class="text-center text-small text-gray-500">{(chance*100).toLocaleString(undefined,{maximumFractionDigits:1})+"%"}</p>
@@ -122,9 +123,16 @@
     <InputColour colour="green" name="green" placeholder="G" bind:value={colours.gRaw} max=6 />
     <InputColour colour="blue" name="blue" placeholder="B" bind:value={colours.bRaw} max=6 />
     <InputColour colour="black" name="unassigned" placeholder="U" bind:value={colours.uRaw} max=6 />
-    <button class="text-center justify-center border rounded-full border-gray-100">?</button>
+    <button class="text-center justify-center border rounded-full border-gray-100 px-2" onclick={() => showUWInfo = !showUWInfo}>?</button>
     <InputColour colour="white" name="white" placeholder="W" bind:value={colours.wRaw} max=6 />
   </div>
+
+  {#if showUWInfo}
+    <DisplayOption basepic="Scroll of Wisdom" text={`"U" stands for "Unfixed" - these are sockets where you don't care about the colour`} costs={[]} />
+    <DisplayOption basepic="Scroll of Wisdom" text={`"W" stands for "White" - this acts the same as the RGB sockets`} costs={[]} />
+    <DisplayOption basepic="Scroll of Wisdom" modifier="Vaal Orb" text={`The Double Corrupt icon adds Vaal Orb costs (use this if your item is corrupted)`} costs={[]} />
+    <svg class="w-full h-0.5"><line x1="0" x2="10000" stroke="white"/></svg>
+  {/if}
 
   {#if ready == "Ready" && !colours.w}
     <div style="order: {sortArr.findIndex(elem => elem[1] == 0)}" class="text-center">
