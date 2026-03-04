@@ -57,8 +57,8 @@
 	
 	let pages: Record<string, string> = {
 		"chromaticalc": "Chromatic Orb",
-		"socketcalc": "Orb of Fusing",
-		"conflictcalc": "Orb of Conflict",
+		// "socketcalc": "Orb of Fusing",
+		// "conflictcalc": "Orb of Conflict",
 		// "cooldowncalc": "Awakened Cast on Critical Strike Support",
 		// "adornedcalc" : "The Adorned",
 		// "weightcalc" : "Albino Rhoa Feather",

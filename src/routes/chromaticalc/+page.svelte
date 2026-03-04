@@ -19,7 +19,7 @@
   let leagues = getLEAGUES()
   
   import { Colours } from '$lib/logic/colours.svelte';
-  const colours = new Colours(2,2,1,1)
+  const colours = new Colours()
   import { Requirements } from '$lib/logic/requirements.svelte';
   const requirements = new Requirements(null,null,293)
   let corrupted = $state(false)
@@ -111,7 +111,7 @@
     <!-- <button class="border-red-950 border rounded-md col-span-3" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted">
       <Icon itemIdentifier="vaal" variant="inline" />
     </button> -->
-    <button class="rounded-md col-span-3 row-span-2 bg-cover bg-center bg-no-repeat" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
+    <button class="rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
 
     {#each requirements.allProb as chance}
       <p class="text-center text-small text-gray-500">{(chance*100).toLocaleString(undefined,{maximumFractionDigits:1})+"%"}</p>
