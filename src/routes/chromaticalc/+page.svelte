@@ -115,7 +115,7 @@
     <button class="rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
 
     {#each requirements.allProb as chance}
-      <p class="text-center text-small text-gray-500">{(chance*100).toLocaleString(undefined,{maximumFractionDigits:1})+"%"}</p>
+      <p class="text-center text-small text-dark-600">{(chance*100).toLocaleString(undefined,{maximumFractionDigits:1})+"%"}</p>
     {/each}
     <!-- <p class="col-span-3"></p> -->
     
@@ -123,7 +123,7 @@
     <InputColour colour="green" name="green" placeholder="G" bind:value={colours.gRaw} max=6 />
     <InputColour colour="blue" name="blue" placeholder="B" bind:value={colours.bRaw} max=6 />
     <InputColour colour="black" name="unassigned" placeholder="U" bind:value={colours.uRaw} max=6 />
-    <button class="text-center justify-center border rounded-full border-gray-100 px-2" onclick={() => showUWInfo = !showUWInfo}>?</button>
+    <button class="text-center justify-center border rounded-full border-dark-100 px-2" onclick={() => showUWInfo = !showUWInfo}>?</button>
     <InputColour colour="white" name="white" placeholder="W" bind:value={colours.wRaw} max=6 />
   </div>
 
@@ -138,7 +138,7 @@
     <div style="order: {sortArr.findIndex(elem => elem[1] == 0)}" class="text-center">
       <DisplayOption basepic="Chromatic Orb" text={`Chromatic Orb - ${arrayToRGB(infoChromatic.recipe)}`} rgb={infoChromatic.recipe} costs={infoChromatic.costShow} strong={showChromatic} vaal={corrupted} onclick={() => showChromatic = !showChromatic} />
       {#if showChromatic}
-        <span class="font-bold w-full bg-gray-900 p-1 inline-grid grid-cols-4 border-t-gray-700 border-t rounded-lg">
+        <span class="font-bold w-full bg-dark-950 p-1 inline-grid grid-cols-4 border-t-dark-800 border-t rounded-lg">
             <p>Craft Type</p>
             <p>Average Cost</p>
             <p>Success Chance</p>
@@ -146,9 +146,9 @@
         </span>
         {#each infoChromatic.infos as infoBench, i}
           <span class="w-full p-0.5 inline-grid grid-cols-4
-              {infoChromatic.costs.indexOf(infoChromatic.costMin) == i ? "font-bold bg-gray-700 rounded-lg" : "bg-gray-900"}
-              {infoChromatic.costs.indexOf(infoChromatic.costMin)+1 == i ? "" : "border-t-gray-700 border-t"}
-              {infoChromatic.costs.length-1 == i ? "border-b-gray-700 border-b rounded-b-lg" : ""} ">
+              {infoChromatic.costs.indexOf(infoChromatic.costMin) == i ? "font-bold bg-dark-800 rounded-lg" : "bg-dark-950"}
+              {infoChromatic.costs.indexOf(infoChromatic.costMin)+1 == i ? "" : "border-t-dark-800 border-t"}
+              {infoChromatic.costs.length-1 == i ? "border-b-dark-800 border-b rounded-b-lg" : ""} ">
             <InlineRGB rgb={infoBench[1]} printchrome={true} alignment="centered" />
             <IconCosts costs={[["Chromatic Orb", 1/infoBench[0]*infoBench[2]]]}/>
             <p>{(100*infoBench[0]).toLocaleString(undefined,{maximumFractionDigits:5, minimumFractionDigits:5})}%</p>
@@ -164,7 +164,7 @@
       <DisplayOption basepic="Jeweller's Orb" text={'Jeweller Method (Vorici Method)'} costs={infoJeweller.costs} strong={showJeweller} vaal={corrupted} onclick={()=>showJeweller=!showJeweller} />
       {#if showJeweller}
         {#each infoJeweller.instructions as instruction, i}
-          <span class="w-full p-0.5 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] bg-gray-900 border-t-gray-700 border-t {0 == i ? "rounded-t-lg" : ""}">
+          <span class="w-full p-0.5 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] bg-dark-950 border-t-dark-800 border-t {0 == i ? "rounded-t-lg" : ""}">
             <p class="italic text-right">Step {i+1}:</p>
             <span class="inline-flex">
               <p class="text-wrap text-left">{@html instruction[0]}</p>
@@ -172,7 +172,7 @@
             </span>
           </span>
         {/each}
-        <span class="w-full mt-1 py-2 px-1 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] text-base bg-gray-900 border-t-gray-400 border-t-2 border-b-gray-700 border-b rounded-b-lg">
+        <span class="w-full mt-1 py-2 px-1 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] text-base bg-dark-950 border-t-dark-500 border-t-2 border-b-dark-800 border-b rounded-b-lg">
           <p class="whitespace-pre-wrap col-span-2">{@html 
             `The Jeweller Method uses the Crafting Bench's socket crafts to reroll the colour of one socket at a time. \n\n` +
             

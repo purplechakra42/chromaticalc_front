@@ -9,11 +9,11 @@
     } = $props()
 
     const colourVariants: Record<string, string> = {
-        red: "bg-red-200 border-red-600 text-gray-900",
-        green: "bg-green-200 border-green-600 text-gray-900",
-        blue: "bg-blue-200 border-blue-600 text-gray-900",
-        black: "bg-gray-900 border-gray-400 text-gray-300",
-        white: "bg-gray-200 border-gray-600 text-gray-900",
+        red: "bg-red-200 border-red-600 text-dark-950",
+        green: "bg-green-200 border-green-600 text-dark-950",
+        blue: "bg-blue-200 border-blue-600 text-dark-950",
+        black: "bg-dark-950 border-dark-400 text-dark-300",
+        white: "bg-dark-200 border-dark-700 text-dark-950",
     };
     const hideSpinners = "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 </script>

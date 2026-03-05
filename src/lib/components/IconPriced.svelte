@@ -24,7 +24,7 @@
         }
     })
 
-    let loadingFormat = $derived(leagues.loading || info[0] == 0 ? "bg-linear-to-r from-gray-700 to-gray-800 rounded-full" : "")
+    let loadingFormat = $derived(leagues.loading || info[0] == 0 ? "bg-linear-to-r from-dark-800 to-dark-900 rounded-full" : "")
 </script>
 
 <span class="flex gap-1">

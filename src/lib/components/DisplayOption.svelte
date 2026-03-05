@@ -20,12 +20,12 @@
     } = $props()
     
     let corruptedFormatting = $derived([
-        (vaal||unavailable) ? "border-red-700" : "border-gray-700",
+        (vaal||unavailable) ? "border-red-900" : "border-dark-800",
         unavailable && "opacity-50"
     ].filter(Boolean).join(" "))
 </script>
 
-<button class="w-full flex flex-col md:flex-row gap-1 md:gap-[1ch] p-[1ch] items-center rounded-lg border {corruptedFormatting} bg-gray-800 text-white {onclick ? "cursor-pointer" : ""}" {onclick} >
+<button class="w-full flex flex-col md:flex-row gap-1 md:gap-[1ch] p-[1ch] items-center rounded-lg border {corruptedFormatting} bg-dark-900 text-white {onclick ? "cursor-pointer" : ""}" {onclick} >
     {#if !modifier && !vaal}
         <Icon itemIdentifier={basepic} />
     {:else}
@@ -44,7 +44,7 @@
     {#if JSON.stringify(costs) !== JSON.stringify([])}
         <span class="flex gap-[1ch]">
             <IconCosts {costs} />
-            <p class="text-center text-gray-500">|</p>
+            <p class="text-center text-dark-600">|</p>
             <IconPriced {costs} />
         </span>
     {/if}

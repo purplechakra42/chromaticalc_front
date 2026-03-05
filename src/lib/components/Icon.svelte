@@ -11,8 +11,8 @@
     let variantStyling = $derived({
         base: "h-11 w-11 flex-none",
         modifier: "h-6 w-6 absolute right-0 bottom-0 flex-none",
-        nav_inactive: "h-12 w-12 border rounded-full p-1 border-gray-600 bg-gray-700 flex-none",
-        nav_active: "h-12 w-12 border rounded-full p-1 border-gray-100 bg-gray-700 flex-none",
+        nav_inactive: "h-12 w-12 border rounded-full p-1 border-dark-700 bg-dark-800 flex-none",
+        nav_active: "h-12 w-12 border rounded-full p-1 border-dark-100 bg-dark-800 flex-none",
         inline: "h-7 w-7 inline-block flex-none",
     }[variant])
 
@@ -23,5 +23,5 @@
 {#if !leagues.loading && itemInfo}
     <img class="{variantStyling}" src={`https://web.poecdn.com${itemInfo?.image}`} alt={`${itemInfo.name}${variant=="modifier" ? " (Modifier)" : ""}`} />
 {:else}
-    <div class="{variantStyling} bg-linear-to-r from-gray-700 to-gray-800 rounded-full"></div>
+    <div class="{variantStyling} bg-linear-to-r from-dark-800 to-dark-900 rounded-full"></div>
 {/if}

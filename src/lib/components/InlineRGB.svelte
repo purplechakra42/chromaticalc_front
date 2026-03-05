@@ -16,7 +16,7 @@
 
 <span class="inline-flex {alignmentStyle} {bold?"font-bold":""} px-[0.5ch] text-white">
     {#if rgb.every(col => !col) && printchrome}
-        <p class={coloured?"text-gray-200":""}>Chromatic (No Bench)</p>
+        <p class={coloured?"text-dark-200":""}>Chromatic (No Bench)</p>
     {:else}
         {#if rgb[0]}
             <p class={coloured?"text-red-200":""}>{rgb[0]}R</p>
