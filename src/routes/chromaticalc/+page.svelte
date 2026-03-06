@@ -112,7 +112,7 @@
     <!-- <button class="border-red-950 border rounded-md col-span-3" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted">
       <Icon itemIdentifier="vaal" variant="inline" />
     </button> -->
-    <button class="rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
+    <button class="rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90 {corrupted?"border border-red-900":''}" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
 
     {#each requirements.allProb as chance}
       <p class="text-center text-small text-dark-600">{(chance*100).toLocaleString(undefined,{maximumFractionDigits:1})+"%"}</p>
