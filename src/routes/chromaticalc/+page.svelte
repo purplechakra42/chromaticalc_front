@@ -1,6 +1,6 @@
 <script lang="ts">
   // import { oneSocketJumpInformation, nSocketJumpInformation } from "$lib/logic/constants"
-  import { checkAllRequirements, calculateColoursBench, calculateColoursVorici, calculateColoursTaintedChrome, calculateColoursBlanching } from '$lib/logic/calc'
+  import { checkAllRequirements, calculateColoursBench, calculateColoursJeweller, calculateColoursTaintedChrome, calculateColoursBlanching } from '$lib/logic/calc'
   import { calculateHarvestWhites, calculateBlanchingWhites } from '$lib/logic/calc'
   import { parseJewellerTree, arrayToRGB, sumOfElements } from '$lib/logic/calc'
   import type { JewellerTree, Instruction } from '$lib/logic/calc';
@@ -44,12 +44,26 @@
       return { infos: false, recipe: [0,0,0,0], start: 0, instructions: [['',[]]] as Instruction[], costJeweller: 0, costs: [] }
     }
 
-    let [infos, recipe, start] = calculateColoursVorici(colours, requirements)
-    let instructions:Instruction[] = parseJewellerTree(infos as JewellerTree, colours)
-    let costJeweller = (infos as JewellerTree)[colours.total-colours.u][0].cost
-    let extraCostJeweller = colours.u > 0 ? recipesSockets[colours.total][1] : 0 // if there are unfixed sockets, add the cost for that benchcraft too
-    let costs:[string,number][] = [["Jeweller's Orb", costJeweller + extraCostJeweller], ["Chromatic Orb", recipe[3]], ['Vaal Orb', corrupted ? costJeweller+extraCostJeweller+recipe[3] : 0]]
-    return { infos, recipe, start, instructions, costJeweller, costs }
+    let [trees, startingRecipes] = calculateColoursJeweller(colours, requirements)
+    if (trees.length==0) { return { infos: false, recipe: [0,0,0,0], start: 0, instructions: [['',[]]] as Instruction[], costJeweller: 0, costs: [] } }
+
+    let bestTreeInfo = {tree: trees[0], startingRecipe: startingRecipes[0], costArr: [] as [string,number][], cost: 0}
+    for (const [i, tree] of trees.entries()) {
+      let jewellercost = tree[colours.total-colours.u][0].cost
+      let unfixedjewellercost = colours.u > 0 ? recipesSockets[colours.total][1] : 0
+      let chromaticcost = startingRecipes[i][3]
+      
+      let costArr: [string,number][] = [["Jeweller's Orb", jewellercost+unfixedjewellercost], ["Chromatic Orb", chromaticcost], ["Vaal Orb", corrupted ? jewellercost+unfixedjewellercost+chromaticcost : 0]]
+      let cost = getPrice({costs:costArr, format:"c"})
+
+      if ( cost[0] < bestTreeInfo.cost || bestTreeInfo.cost==0 ) {
+        bestTreeInfo = {tree: tree, startingRecipe: startingRecipes[i], costArr: costArr, cost: cost[0]}
+      }
+    }
+
+    let instructions:Instruction[] = parseJewellerTree(bestTreeInfo.tree, colours)
+    let start = sumOfElements(bestTreeInfo.startingRecipe.slice(0,3))
+    return { infos: bestTreeInfo.tree, recipe: bestTreeInfo.startingRecipe, start, instructions, costs: bestTreeInfo.costArr } // start is sum of recipe rgb
   })
   // tainted chromes
   let costTaintedChrome:[string,number][] = $derived([['Tainted Chromatic Orb', 1/calculateColoursTaintedChrome(colours)]])
@@ -87,6 +101,10 @@
     return priceArr.sort((a,b) => a[0]-b[0])
   })
 
+  // add hover for all currencies under divine
+  // add url encoding
+  // mess up 6l warning on jeweller?
+
   // discoverability of dropdowns
   // tooltip for U/W box
   // better inputboxes (arrows? scroll? fancier??)
@@ -109,21 +127,17 @@
     <InputColour colour="red" name="STR" bind:value={requirements.strRaw} />
     <InputColour colour="green" name="DEX" bind:value={requirements.dexRaw} />
     <InputColour colour="blue" name="INT" bind:value={requirements.intRaw} />
-    <!-- <button class="border-red-950 border rounded-md col-span-3" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted">
-      <Icon itemIdentifier="vaal" variant="inline" />
-    </button> -->
-    <button class="rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90 {corrupted?"border border-red-900":''}" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
+    <button class="cursor-pointer rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90 {corrupted?"border border-red-900":''}" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
 
     {#each requirements.allProb as chance}
       <p class="text-center text-small text-dark-600">{(chance*100).toLocaleString(undefined,{maximumFractionDigits:1})+"%"}</p>
     {/each}
-    <!-- <p class="col-span-3"></p> -->
     
     <InputColour colour="red" name="red" placeholder="R" bind:value={colours.rRaw} max=6 />
     <InputColour colour="green" name="green" placeholder="G" bind:value={colours.gRaw} max=6 />
     <InputColour colour="blue" name="blue" placeholder="B" bind:value={colours.bRaw} max=6 />
     <InputColour colour="black" name="unassigned" placeholder="U" bind:value={colours.uRaw} max=6 />
-    <button class="text-center justify-center border rounded-full border-dark-100 px-2" onclick={() => showUWInfo = !showUWInfo}>?</button>
+    <button class="text-center justify-center border rounded-full border-dark-100 px-2 cursor-pointer" onclick={() => showUWInfo = !showUWInfo}>?</button>
     <InputColour colour="white" name="white" placeholder="W" bind:value={colours.wRaw} max=6 />
   </div>
 
@@ -161,7 +175,7 @@
 
   {#if ready == "Ready" && colours.total !== 1 && !colours.w}
     <div style="order: {sortArr.findIndex(elem => elem[1] == 1)}" class="">
-      <DisplayOption basepic="Jeweller's Orb" text={'Jeweller Method (Vorici Method)'} costs={infoJeweller.costs} strong={showJeweller} vaal={corrupted} onclick={()=>showJeweller=!showJeweller} />
+      <DisplayOption basepic="Jeweller's Orb" text={'Jeweller Method'} costs={infoJeweller.costs} strong={showJeweller} vaal={corrupted} onclick={()=>showJeweller=!showJeweller} />
       {#if showJeweller}
         {#each infoJeweller.instructions as instruction, i}
           <span class="w-full p-0.5 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] bg-dark-950 border-t-dark-800 border-t {0 == i ? "rounded-t-lg" : ""}">

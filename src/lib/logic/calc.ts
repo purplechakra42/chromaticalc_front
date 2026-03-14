@@ -31,7 +31,7 @@ export function checkAllRequirements(colours: Colours, requirements: Requirement
             throw new Error(`Socket colour formula is unknown for items with 3 non-zero, non-identical requirements!\nTesting can be done on Akoya's Gaze or The Golden Charlatan.`)
         }
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         return error as string
     }
 
@@ -57,10 +57,9 @@ export function calculateColoursBench(colours: Colours, requirements: Requiremen
     return out
 }
 
-export function calculateColoursVorici(colours: Colours, requirements: Requirements): [boolean|JewellerTree, number[], number] {
-    let storedcost = 0
-    let storedtree: boolean|JewellerTree = false
-    let storedrecipeStart: number[] = []
+export function calculateColoursJeweller(colours: Colours, requirements: Requirements): [JewellerTree[], number[][]] {
+    let storedTrees: JewellerTree[] = []
+    let storedStartingRecipes: number[][] = []
 
     for (const [i, recipe] of recipesChromes.entries()) {
         if (i==0) { continue } // to reduce complexity, manually chroming to start is not considered (if the jeweller method is cheaper, it's unlikely that your chrome odds are good anyway)
@@ -77,17 +76,12 @@ export function calculateColoursVorici(colours: Colours, requirements: Requireme
                     }]
                 }
                 const tree = generateJewellerTree(colours.rgb, requirements.allProb, startingSockets, startingTree)
-                let cost = tree[sumOfElements(colours.rgb)][0].cost
-                if (storedcost == 0 || storedcost > cost) { // store if it's the best result
-                    storedcost = cost
-                    storedtree = tree
-                    storedrecipeStart = recipe
-                }
+                storedTrees.push(tree)
+                storedStartingRecipes.push(recipe)
             }
         }
     }
-    if (storedtree == false) { throw new Error('no valid jeweller tree found!')}
-    return [storedtree, storedrecipeStart, sumOfElements(storedrecipeStart.slice(0,3))]
+    return [storedTrees, storedStartingRecipes]
 }
 
 export function calculateColoursTaintedChrome(colours: Colours): number {    
