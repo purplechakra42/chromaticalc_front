@@ -101,7 +101,6 @@
     return priceArr.sort((a,b) => a[0]-b[0])
   })
 
-  // add hover for all currencies under divine
   // add url encoding
   // mess up 6l warning on jeweller?
 

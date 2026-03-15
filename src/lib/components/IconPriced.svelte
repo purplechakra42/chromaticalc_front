@@ -1,5 +1,6 @@
 <script lang="ts">
     import { getPrice } from "$lib/utils/getPrice";
+    import { formatCost } from "$lib/utils/formatCost";
     import { getLEAGUES } from "$lib/context";
     let leagues = getLEAGUES()
     import Icon from "./Icon.svelte";
@@ -14,14 +15,7 @@
     let costFormatted = $derived.by(() => { // coerce cost to be PAD or less characters
         if (leagues.loading || info[0] == 0) return "" // if loading OR the ninja api doesn't have prices for what we need
 
-        let costLength = info[0].toFixed().length
-        if (costLength >= pad+1) {
-            return `${(info[0]/1000).toFixed()}k`
-        } else if (costLength == pad) {
-            return `${info[0].toFixed()}`
-        } else {
-            return `${info[0].toFixed(1)}`
-        }
+        return formatCost(info[0], 4)
     })
 
     let loadingFormat = $derived(leagues.loading || info[0] == 0 ? "bg-linear-to-r from-dark-800 to-dark-900 rounded-full" : "")

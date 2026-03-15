@@ -1,12 +1,13 @@
 <script lang="ts">
 	import './layout.css'
-
+	
+	import { page } from '$app/state'
 	import { setLEAGUES, getLEAGUES, setDATA, getDATA } from "$lib/context"
 	import type { NinjaResponse } from "$lib/utils/fetchNinja"
 
 	import NavBarElement from '$lib/components/NavBarElement.svelte';
-	import IconPriced from '$lib/components/IconPriced.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import IconPricedRatio from '$lib/components/IconPricedRatio.svelte';
 	
 	let { data, children } = $props();
 
@@ -63,6 +64,16 @@
 		// "adornedcalc" : "The Adorned",
 		// "weightcalc" : "Albino Rhoa Feather",
 	}
+	let showcurrencies = $state(false)
+	let currenciesToDisplay: Record<string, string[]> = {
+		"/chromaticalc": ["Chromatic Orb", "Jeweller's Orb", "Vaal Orb", "Tainted Chromatic Orb", "Omen of Blanching", "sacred-lifeforce", "wild-lifeforce"],
+		"/socketcalc": ["Jeweller's Orb", "Orb of Fusing", "Vaal Orb", "Tainted Jeweller's Orb", "Tainted Orb of Fusing"],
+		"/conflictcalc": ["Orb of Conflict", "Lesser Eldritch Ichor", "Greater Eldritch Ichor", "Grand Eldritch Ichor", "Exceptional Eldritch Ichor", "Lesser Eldritch Ember", "Greater Eldritch Ember", "Grand Eldritch Ember", "Exceptional Eldritch Ember"],
+		// "cooldowncalc": [],
+		// "adornedcalc" : [],
+		// "weightcalc" : [],
+	}
+	
 </script>
 
 <div id="content" class="min-h-screen bg-dark-950 text-white flex">
@@ -78,11 +89,16 @@
 					<option value={league.id}>{league.name}</option>
 				{/each}
 			</select>
-			<span class="flex px-[1ch] py-1 gap-1 rounded-lg border border-dark-700 hover:bg-dark-700 hover:border-dark-600">
-				<Icon itemIdentifier="divine" variant="inline" />
-				<span>=</span>
-				<IconPriced costs={[["divine", 1]]} format="c" />
-			</span>
+			<div class="rounded-lg border border-dark-700 hover:bg-dark-700 hover:border-dark-600" role="status" onmouseenter={() => showcurrencies=true} onmouseleave={() => showcurrencies=false}>
+				<IconPricedRatio left="divine"/>
+			</div>
+			{#if showcurrencies}
+				<div class="absolute top-12 rounded-lg border bg-dark-800 border-dark-700 z-10">
+					{#each currenciesToDisplay[page.url.pathname] as curr}
+						<IconPricedRatio left={curr}/>
+					{/each}
+				</div>
+			{/if}
 		</header>
 		{@render children()}
 		<footer class="mt-auto flex-none py-2">
