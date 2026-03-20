@@ -1,7 +1,8 @@
 import type { Colours } from "$lib/logic/colours.svelte";
 import type { Requirements } from "$lib/logic/requirements.svelte";
+import type { Corrupted } from "$lib/logic/corrupted.svelte";
 
-export function encodeParams(colours: Colours, requirements: Requirements, corrupted: boolean): string {
+export function encodeParams(colours: Colours, requirements: Requirements, corrupted: Corrupted): string {
     let params = ''
 
     let paramsRequirements = [requirements.strRaw, requirements.dexRaw, requirements.intRaw]
@@ -10,7 +11,7 @@ export function encodeParams(colours: Colours, requirements: Requirements, corru
     let paramsColour = [colours.rRaw, colours.gRaw, colours.bRaw, colours.uRaw, colours.wRaw]
     params += paramsColour.map((col, i) => col ? 'rgbuw'[i] + col : '').join('')
 
-    params += corrupted ? 'v' : ''
+    params += corrupted.corrupted ? 'v' : ''
 
     return params
 }

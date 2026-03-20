@@ -26,9 +26,7 @@
 
   import { requirements } from '$lib/logic/requirements.svelte';
   import { colours } from '$lib/logic/colours.svelte';
-  // const requirements = new Requirements()
-  // const colours = new Colours()
-  let corrupted = $state(false)
+  import { corrupted } from '$lib/logic/corrupted.svelte';
 
   let mounted = $state(false)
   onMount(async () => {
@@ -45,7 +43,7 @@
       colours.uRaw = inputs.uRaw
       colours.wRaw = inputs.wRaw
 
-      corrupted = inputs.corrupted
+      corrupted.corrupted = inputs.corrupted
     }
 
     await tick() // cringe
@@ -68,7 +66,7 @@
     let infos = calculateColoursBench(colours, requirements) // prob, recipe, recipe cost
     let costs = infos.map(([prob, , rcost]) => 1/prob*rcost)
     let costMin = Math.min(...costs)
-    let costShow: Cost[] = [['Chromatic Orb', costMin], ['Vaal Orb', corrupted ? costMin : 0 ]]
+    let costShow: Cost[] = [['Chromatic Orb', costMin], ['Vaal Orb', corrupted.corrupted ? costMin : 0 ]]
     let recipe = infos[costs.indexOf(costMin)][1]
     return { infos, costs, costMin, costShow, recipe }
   })
@@ -87,7 +85,7 @@
       let unfixedjewellercost = colours.u > 0 ? recipesSockets[colours.total][1] : 0
       let chromaticcost = startingRecipes[i][3]
       
-      let costArr: Cost[] = [["Jeweller's Orb", jewellercost+unfixedjewellercost], ["Chromatic Orb", chromaticcost], ["Vaal Orb", corrupted ? jewellercost+unfixedjewellercost+chromaticcost : 0]]
+      let costArr: Cost[] = [["Jeweller's Orb", jewellercost+unfixedjewellercost], ["Chromatic Orb", chromaticcost], ["Vaal Orb", corrupted.corrupted ? jewellercost+unfixedjewellercost+chromaticcost : 0]]
       let cost = getPrice({costs:costArr, format:"c"})
 
       if ( cost[0] < bestTreeInfo.cost || bestTreeInfo.cost==0 ) {
@@ -160,7 +158,7 @@
     <InputColour colour="red" name="STR" bind:value={requirements.strRaw} />
     <InputColour colour="green" name="DEX" bind:value={requirements.dexRaw} />
     <InputColour colour="blue" name="INT" bind:value={requirements.intRaw} />
-    <button class="cursor-pointer rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90 {corrupted?"border border-red-900":''}" style="background-image: url({icon})" onclick={() => corrupted = !corrupted} aria-label="toggle corrupted"></button>
+    <button class="cursor-pointer rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90 {corrupted.corrupted?"border border-red-900":''}" style="background-image: url({icon})" onclick={() => corrupted.corrupted = !corrupted.corrupted} aria-label="toggle corrupted"></button>
 
     {#each requirements.allProb as chance}
       <p class="text-center text-small text-dark-600">{(chance*100).toLocaleString(undefined,{maximumFractionDigits:1})+"%"}</p>
@@ -183,7 +181,7 @@
 
   {#if ready == "Ready" && !colours.w}
     <div style="order: {sortArr.findIndex(elem => elem[1] == 0)}" class="text-center">
-      <DisplayOption basepic="Chromatic Orb" text={`Chromatic Orb - ${arrayToRGB(infoChromatic.recipe)}`} rgb={infoChromatic.recipe} costs={infoChromatic.costShow} strong={showChromatic} vaal={corrupted} onclick={() => showChromatic = !showChromatic} />
+      <DisplayOption basepic="Chromatic Orb" text={`Chromatic Orb - ${arrayToRGB(infoChromatic.recipe)}`} rgb={infoChromatic.recipe} costs={infoChromatic.costShow} strong={showChromatic} vaal={corrupted.corrupted} onclick={() => showChromatic = !showChromatic} />
       {#if showChromatic}
         <span class="font-bold w-full bg-dark-950 p-1 inline-grid grid-cols-4 border-t-dark-800 border-t rounded-lg">
             <p>Craft Type</p>
@@ -208,7 +206,7 @@
 
   {#if ready == "Ready" && colours.total !== 1 && !colours.w}
     <div style="order: {sortArr.findIndex(elem => elem[1] == 1)}" class="">
-      <DisplayOption basepic="Jeweller's Orb" text={'Jeweller Method'} costs={infoJeweller.costs} strong={showJeweller} vaal={corrupted} onclick={()=>showJeweller=!showJeweller} />
+      <DisplayOption basepic="Jeweller's Orb" text={'Jeweller Method'} costs={infoJeweller.costs} strong={showJeweller} vaal={corrupted.corrupted} onclick={()=>showJeweller=!showJeweller} />
       {#if showJeweller}
         {#each infoJeweller.instructions as instruction, i}
           <span class="w-full p-0.5 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] bg-dark-950 border-t-dark-800 border-t {0 == i ? "rounded-t-lg" : ""}">
@@ -241,7 +239,7 @@
   {/if}
 
   {#if ready == "Ready" && !leagues.loading && colours.w && colours.w <= 3 && colours.total !== colours.w}
-    <DisplayOption basepic="Omen of Blanching" text="Omen of Blanching" costs={costBlanching} unavailable={corrupted} />
+    <DisplayOption basepic="Omen of Blanching" text="Omen of Blanching" costs={costBlanching} unavailable={corrupted.corrupted} />
   {/if}
 
   {#if ready == "Ready" && !leagues.loading && colours.w && colours.total == colours.w}

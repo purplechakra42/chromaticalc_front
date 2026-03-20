@@ -10,10 +10,12 @@
 
 	import { colours } from '$lib/logic/colours.svelte.js';
 	import { requirements } from '$lib/logic/requirements.svelte';
+	import { corrupted } from '$lib/logic/corrupted.svelte.js';
 	function resetChromatiCalc() {
 		if (page.url.pathname == '/chromaticalc') {
 			requirements.reset()
 			colours.reset()
+			corrupted.corrupted = false
 		}
 	}
 	
