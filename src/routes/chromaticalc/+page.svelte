@@ -234,7 +234,7 @@
 
   {#if ready == "Ready" && !leagues.loading && !colours.w}
     <div style="order: {sortArr.findIndex(elem => elem[1] == 2)}" class="">
-      <DisplayOption basepic="Tainted Chromatic Orb" text="Tainted Chromatic Orb {!corrupted ? "(Item needs to be Corrupted first)" : ""}" costs={costTaintedChrome} unavailable={!corrupted} />
+      <DisplayOption basepic="Tainted Chromatic Orb" text="Tainted Chromatic Orb {!corrupted.corrupted ? "(Item needs to be Corrupted first)" : ""}" costs={costTaintedChrome} unavailable={!corrupted.corrupted} />
     </div>
   {/if}
 
