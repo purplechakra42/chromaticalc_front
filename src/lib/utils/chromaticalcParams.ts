@@ -27,6 +27,6 @@ export function decodeParams(params: string) {
         bRaw: Number(params.match(/b(\d+)/)?.[1]) || null,
         uRaw: Number(params.match(/u(\d+)/)?.[1]) || null,
         wRaw: Number(params.match(/w(\d+)/)?.[1]) || null,
-        corrupted: params.match(/w(\d+)/) ? true : false
+        corrupted: params.match(/v/) ? true : false
     }
 }

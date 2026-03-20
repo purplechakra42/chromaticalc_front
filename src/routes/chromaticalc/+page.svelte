@@ -44,6 +44,8 @@
       colours.bRaw = inputs.bRaw
       colours.uRaw = inputs.uRaw
       colours.wRaw = inputs.wRaw
+
+      corrupted = inputs.corrupted
     }
 
     await tick() // cringe
