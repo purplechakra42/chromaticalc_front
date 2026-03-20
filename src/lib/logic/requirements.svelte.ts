@@ -11,6 +11,12 @@ export class Requirements {
         this.intRaw = int
     }
 
+    reset() {
+        this.strRaw = null
+        this.dexRaw = null
+        this.intRaw = null
+    }
+
     #allzero = $derived<boolean>(!this.strRaw && !this.dexRaw && !this.intRaw)
     get all() { return [this.str, this.dex, this.int]}
     get str() { return this.#allzero ? 1 : this.strRaw ?? 0 }
@@ -22,3 +28,5 @@ export class Requirements {
     get dexProb() { return this.allProb[1] }
     get intProb() { return this.allProb[2] }
 }
+
+export const requirements = new Requirements()

@@ -2,12 +2,20 @@
 	import './layout.css'
 	
 	import { page } from '$app/state'
-	import { setLEAGUES, getLEAGUES, setDATA, getDATA } from "$lib/context"
+	import { setLEAGUES, setDATA } from "$lib/context"
 	import type { NinjaResponse } from "$lib/utils/fetchNinja"
 
-	import NavBarElement from '$lib/components/NavBarElement.svelte';
-	import Icon from '$lib/components/Icon.svelte';
 	import IconPricedRatio from '$lib/components/IconPricedRatio.svelte';
+	import NavBarElement from '$lib/components/NavBarElement.svelte';
+
+	import { colours } from '$lib/logic/colours.svelte.js';
+	import { requirements } from '$lib/logic/requirements.svelte';
+	function resetChromatiCalc() {
+		if (page.url.pathname == '/chromaticalc') {
+			requirements.reset()
+			colours.reset()
+		}
+	}
 	
 	let { data, children } = $props();
 
@@ -17,9 +25,8 @@
 	let currentLeagueID = $state(data.currentLeagueID)
 	// svelte-ignore state_referenced_locally
 	const infoLeague = $state(data.currentLeagueID) // snapshot using state, used for icon 'cache'
+	let pricesAndItems: Record<string, NinjaResponse> = $state({})
 	let loadingPrices = $state(false)
-
-	let pricesAndItems = $state<Record<string, NinjaResponse>>({}) // better typing than "let pricesAndItems: Record<string, NinjaResponse> = $state({})"
 
 	// get says: when you READ this property, actually run this FUNCTION and return that
 	// set says: when you do L = setLEAGUES(); L.currentLeagueID = Standard; actually update the original currentleagueid which is reactive
@@ -30,7 +37,6 @@
 		get infoLeague() { return infoLeague },
 		get loading() { return loadingPrices }
 	})
-	// setLEAGUES({leagues: leagues, currentLeagueID: currentLeagueID})
 	setDATA(pricesAndItems)
 
 	$effect(() => { // runs when pricesanditems or currentleagueid changes
@@ -79,7 +85,11 @@
 <div id="content" class="min-h-screen bg-dark-950 text-white flex">
 	<nav class="hidden md:flex flex-col fixed inset-y-0 left-0 w-16 border-r border-dark-800 bg-dark-900 p-2 gap-2 justify-start-safe items-center">
 		{#each Object.keys(pages) as page}
-			<NavBarElement href={page} icon={pages[page]}/>
+			{#if page == 'chromaticalc'}
+				<NavBarElement href={page} icon={pages[page]} onclick={() => resetChromatiCalc()} />
+			{:else}
+				<NavBarElement href={page} icon={pages[page]} />
+			{/if}
 		{/each}
 	</nav>
 	<main class="flex-1 flex flex-col md:ml-16">

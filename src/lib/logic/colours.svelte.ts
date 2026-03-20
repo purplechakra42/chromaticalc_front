@@ -19,6 +19,14 @@ export class Colours {
         this.wRaw = w
     }
 
+    reset() {
+        this.rRaw = null
+        this.gRaw = null
+        this.bRaw = null
+        this.uRaw = null
+        this.wRaw = null
+    }
+
     get rgb() { return [this.r??0, this.g??0, this.b??0] }
     get rgbu() { return [this.r??0, this.g??0, this.b??0, this.u??0] }
     get rgbw() { return [this.r??0, this.g??0, this.b??0, this.w??0] }
@@ -27,3 +35,5 @@ export class Colours {
     get total(): number { return (this.r??0)+(this.g??0)+(this.b??0)+(this.u??0)+(this.w??0) }
     get totalFixed(): number { return this.total-(this.u??0) }
 }
+
+export const colours = new Colours()

@@ -423,7 +423,7 @@ function constructSingleValueArray(value: number, index: number, length: number)
 function addValueToOneElement(base: number[], value: number, index: number): number[] {
     return addTwoArrays(base, constructSingleValueArray(value, index, base.length))
 }
-function checkArrayEquality(arr1: number[], arr2: number[]): boolean {
+export function checkArrayEquality(arr1: number[], arr2: number[]): boolean {
     if (arr1.length != arr2.length) {
         throw Error('comparing arrays with different lengths')
     }

@@ -2,10 +2,9 @@
     import Icon from './Icon.svelte';
 	import { page } from '$app/state'
 
-    let { href, icon } = $props()
+    let { href, icon, onclick=null } = $props()
 </script>
 
-<a href={`/${href}`}>
+<a href={`/${href}`} {onclick}>
     <Icon itemIdentifier={icon} variant={page.url.pathname == `/${href}` ? 'nav_active' : 'nav_inactive'} />
-    <!-- <img class="h-12 w-12 border rounded-full p-1 {page.url.pathname == `/${href}` ? "border-dark-100" : "border-dark-600"} bg-dark-700" alt={href} src={icon}/> -->
 </a>

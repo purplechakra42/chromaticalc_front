@@ -1,28 +1,60 @@
 <script lang="ts">
+	import { page } from '$app/state';
+	import { replaceState } from '$app/navigation';
+	import { onMount, tick, untrack } from 'svelte';
+	import { decodeParams, encodeParams } from '$lib/utils/chromaticalcParams';
+
   // import { oneSocketJumpInformation, nSocketJumpInformation } from "$lib/logic/constants"
+	import { blanchingOdds, recipesSockets } from '$lib/logic/constants';
+
   import { checkAllRequirements, calculateColoursBench, calculateColoursJeweller, calculateColoursTaintedChrome, calculateColoursBlanching } from '$lib/logic/calc'
   import { calculateHarvestWhites, calculateBlanchingWhites } from '$lib/logic/calc'
   import { parseJewellerTree, arrayToRGB, sumOfElements } from '$lib/logic/calc'
-  import type { JewellerTree, Instruction } from '$lib/logic/calc';
   type Cost = [string, number]
+  import type { Instruction } from '$lib/logic/calc';
   
-  import InputColour from "$lib/components/InputColour.svelte";
-  import DisplayOption from "$lib/components/DisplayOption.svelte";
-  import icon from '$lib/assets/DCIcon.png';
   import IconCosts from '$lib/components/IconCosts.svelte';
   import InlineRGB from '$lib/components/InlineRGB.svelte';
   import InlineRGBs from '$lib/components/InlineRGBs.svelte';
+  import InputColour from "$lib/components/InputColour.svelte";
+  import DisplayOption from "$lib/components/DisplayOption.svelte";
+  import icon from '$lib/assets/DCIcon.png';
   
   import { getPrice } from '$lib/utils/getPrice';
   import { getLEAGUES } from '$lib/context';
-	import { blanchingOdds, recipesSockets } from '$lib/logic/constants';
   let leagues = getLEAGUES()
-  
-  import { Colours } from '$lib/logic/colours.svelte';
-  const colours = new Colours()
-  import { Requirements } from '$lib/logic/requirements.svelte';
-  const requirements = new Requirements()
+
+  import { requirements } from '$lib/logic/requirements.svelte';
+  import { colours } from '$lib/logic/colours.svelte';
+  // const requirements = new Requirements()
+  // const colours = new Colours()
   let corrupted = $state(false)
+
+  let mounted = $state(false)
+  onMount(async () => {
+    let params = page.url.searchParams.getAll('cfg')[0]
+    const inputs = decodeParams(params)
+    if (inputs) {
+      requirements.strRaw = inputs.strRaw
+      requirements.dexRaw = inputs.dexRaw
+      requirements.intRaw = inputs.intRaw
+
+      colours.rRaw = inputs.rRaw
+      colours.gRaw = inputs.gRaw
+      colours.bRaw = inputs.bRaw
+      colours.uRaw = inputs.uRaw
+      colours.wRaw = inputs.wRaw
+    }
+
+    await tick() // cringe
+    mounted = true
+  })
+
+  $effect(() => {
+    if (!mounted) return
+    const params = encodeParams(colours, requirements, corrupted)
+    replaceState(page.url.pathname + (params ? '?cfg=' + params : ''), {})
+  })
 
   let ready = $derived(checkAllRequirements(colours, requirements))
   let showUWInfo = $state(false)
@@ -34,7 +66,7 @@
     let infos = calculateColoursBench(colours, requirements) // prob, recipe, recipe cost
     let costs = infos.map(([prob, , rcost]) => 1/prob*rcost)
     let costMin = Math.min(...costs)
-    let costShow:Cost[] = [['Chromatic Orb', costMin], ['Vaal Orb', corrupted ? costMin : 0 ]]
+    let costShow: Cost[] = [['Chromatic Orb', costMin], ['Vaal Orb', corrupted ? costMin : 0 ]]
     let recipe = infos[costs.indexOf(costMin)][1]
     return { infos, costs, costMin, costShow, recipe }
   })
@@ -47,13 +79,13 @@
     let [trees, startingRecipes] = calculateColoursJeweller(colours, requirements)
     if (trees.length==0) { return { infos: false, recipe: [0,0,0,0], start: 0, instructions: [['',[]]] as Instruction[], costJeweller: 0, costs: [] } }
 
-    let bestTreeInfo = {tree: trees[0], startingRecipe: startingRecipes[0], costArr: [] as [string,number][], cost: 0}
+    let bestTreeInfo = {tree: trees[0], startingRecipe: startingRecipes[0], costArr: [] as Cost[], cost: 0}
     for (const [i, tree] of trees.entries()) {
       let jewellercost = tree[colours.total-colours.u][0].cost
       let unfixedjewellercost = colours.u > 0 ? recipesSockets[colours.total][1] : 0
       let chromaticcost = startingRecipes[i][3]
       
-      let costArr: [string,number][] = [["Jeweller's Orb", jewellercost+unfixedjewellercost], ["Chromatic Orb", chromaticcost], ["Vaal Orb", corrupted ? jewellercost+unfixedjewellercost+chromaticcost : 0]]
+      let costArr: Cost[] = [["Jeweller's Orb", jewellercost+unfixedjewellercost], ["Chromatic Orb", chromaticcost], ["Vaal Orb", corrupted ? jewellercost+unfixedjewellercost+chromaticcost : 0]]
       let cost = getPrice({costs:costArr, format:"c"})
 
       if ( cost[0] < bestTreeInfo.cost || bestTreeInfo.cost==0 ) {
@@ -61,14 +93,14 @@
       }
     }
 
-    let instructions:Instruction[] = parseJewellerTree(bestTreeInfo.tree, colours)
+    let instructions: Instruction[] = parseJewellerTree(bestTreeInfo.tree, colours)
     let start = sumOfElements(bestTreeInfo.startingRecipe.slice(0,3))
     return { infos: bestTreeInfo.tree, recipe: bestTreeInfo.startingRecipe, start, instructions, costs: bestTreeInfo.costArr } // start is sum of recipe rgb
   })
   // tainted chromes
-  let costTaintedChrome:[string,number][] = $derived([['Tainted Chromatic Orb', 1/calculateColoursTaintedChrome(colours)]])
+  let costTaintedChrome: Cost[] = $derived([['Tainted Chromatic Orb', 1/calculateColoursTaintedChrome(colours)]])
   // blanching omens
-  let costBlanching:[string,number][] = $derived([['Omen of Blanching', 1/calculateColoursBlanching(colours, requirements)]])
+  let costBlanching: Cost[] = $derived([['Omen of Blanching', 1/calculateColoursBlanching(colours, requirements)]])
 
   // various techniques for getting white sockets (no other colours)
   let costWhites: [string, string, string, Cost[]][] = $derived.by(() => {
@@ -101,17 +133,17 @@
     return priceArr.sort((a,b) => a[0]-b[0])
   })
 
-  // add url encoding
+  // add links to home page
   // mess up 6l warning on jeweller?
-
+  
   // discoverability of dropdowns
   // tooltip for U/W box
   // better inputboxes (arrows? scroll? fancier??)
   // nicer vaal switch
   // finish blanching spreadsheet
-
+  
   // handle U in jeweller method for 2 jumps
-  // handle U/RGB in Harvest methods
+  // handle RGB+U in Harvest methods (run sim on colours + white changed to u, then white simulation?)
 </script>
 
 <svelte:head>
