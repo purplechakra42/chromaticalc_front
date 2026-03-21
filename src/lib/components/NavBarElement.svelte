@@ -5,6 +5,6 @@
     let { href, icon, onclick=null } = $props()
 </script>
 
-<a href={`/${href}`} {onclick}>
-    <Icon itemIdentifier={icon} variant={page.url.pathname == `/${href}` ? 'nav_active' : 'nav_inactive'} />
+<a href={`${href}`} {onclick}>
+    <Icon itemIdentifier={icon} variant={page.url.pathname == `${href}` ? 'nav_active' : 'nav_inactive'} />
 </a>

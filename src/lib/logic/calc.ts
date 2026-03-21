@@ -173,7 +173,7 @@ export function requirementsToChances(requirements: number[]): number[] {
     return(requirements.map(req => requirementToChance(req))) // convert each stat requirement into the chance to roll its corresponding colour
 }
 
-interface JewellerState {
+type JewellerState = {
     /** Current socket state (R, G, B) */
     state: number[];
     /** Overall probability to reach this state */
@@ -183,7 +183,7 @@ interface JewellerState {
     /** List of socket states that can be reached from current state */
     nextStates: number[][];
 }
-export interface JewellerTree {
+export type JewellerTree = {
     /** Each socket count holds a list of all states that are possible */
     [socketCount: number]: JewellerState[]
 }

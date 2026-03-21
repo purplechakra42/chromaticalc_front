@@ -64,33 +64,18 @@
       (rule: any) => !["NoParties", "HardMode"].includes(rule.id)) // we don't want SSF or Ruthless modes
     ))
 	
-	let pages: Record<string, string> = {
-		"chromaticalc": "Chromatic Orb",
-		// "socketcalc": "Orb of Fusing",
-		// "conflictcalc": "Orb of Conflict",
-		// "cooldowncalc": "Awakened Cast on Critical Strike Support",
-		// "adornedcalc" : "The Adorned",
-		// "weightcalc" : "Albino Rhoa Feather",
-	}
+	import { pages } from '$lib/pages.js';
 	let showcurrencies = $state(false)
-	let currenciesToDisplay: Record<string, string[]> = {
-		"/chromaticalc": ["Chromatic Orb", "Jeweller's Orb", "Vaal Orb", "Tainted Chromatic Orb", "Omen of Blanching", "sacred-lifeforce", "wild-lifeforce"],
-		"/socketcalc": ["Jeweller's Orb", "Orb of Fusing", "Vaal Orb", "Tainted Jeweller's Orb", "Tainted Orb of Fusing"],
-		"/conflictcalc": ["Orb of Conflict", "Lesser Eldritch Ichor", "Greater Eldritch Ichor", "Grand Eldritch Ichor", "Exceptional Eldritch Ichor", "Lesser Eldritch Ember", "Greater Eldritch Ember", "Grand Eldritch Ember", "Exceptional Eldritch Ember"],
-		// "cooldowncalc": [],
-		// "adornedcalc" : [],
-		// "weightcalc" : [],
-	}
 	
 </script>
 
 <div id="content" class="min-h-screen bg-dark-950 text-white flex">
 	<nav class="hidden md:flex flex-col fixed inset-y-0 left-0 w-16 border-r border-dark-800 bg-dark-900 p-2 gap-2 justify-start-safe items-center">
-		{#each Object.keys(pages) as page}
-			{#if page == 'chromaticalc'}
-				<NavBarElement href={page} icon={pages[page]} onclick={() => resetChromatiCalc()} />
+		{#each pages as page}
+			{#if page.name == 'ChromatiCalc'}
+				<NavBarElement href={page.href} icon={page.icon} onclick={() => resetChromatiCalc()} />
 			{:else}
-				<NavBarElement href={page} icon={pages[page]} />
+				<NavBarElement href={page.href} icon={page.icon} />
 			{/if}
 		{/each}
 	</nav>
@@ -106,7 +91,7 @@
 			</div>
 			{#if showcurrencies}
 				<div class="absolute top-12 rounded-lg border bg-dark-800 border-dark-700 z-10">
-					{#each currenciesToDisplay[page.url.pathname] as curr}
+					{#each pages.find((pg) => pg.href == page.url.pathname)?.displayCurrencies as curr}
 						<IconPricedRatio left={curr}/>
 					{/each}
 				</div>
