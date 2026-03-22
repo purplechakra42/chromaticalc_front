@@ -133,7 +133,6 @@
     return priceArr.sort((a,b) => a[0]-b[0])
   })
 
-  // add links to home page
   // mess up 6l warning on jeweller?
   
   // discoverability of dropdowns
@@ -151,7 +150,7 @@
   <link rel="icon" href="/Chromatic_Orb.png" />
 </svelte:head>
 
-<div class="flex flex-col w-9/10 md:w-6/10 mx-auto gap-3 py-8 md:pt-16 md:text-lg">
+<div class="flex flex-col w-9/10 md:w-6/10 mx-auto gap-3 md:text-lg">
   <h1 class="text-5xl text-center font-bold {ready=="Ready" ? "text-green-300" : ""} pb-4">ChromatiCalc.</h1>
 
   <div class="w-full grid grid-flow-row grid-cols-[2fr_2fr_2fr_1fr_auto_1fr] grid-rows-[3fr_2fr_3fr] gap-2 pb-2">

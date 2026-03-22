@@ -12,7 +12,7 @@
         base: "h-11 w-11 flex-none",
         modifier: "h-6 w-6 absolute right-0 bottom-0 flex-none",
         nav_inactive: "h-12 w-12 border rounded-full p-1 border-dark-700 bg-dark-800 flex-none",
-        nav_active: "h-12 w-12 border rounded-full p-1 border-dark-100 bg-dark-800 flex-none",
+        nav_active: "h-12 w-12 border rounded-full p-1 border-blue-200 bg-slate-800 flex-none",
         inline: "h-7 w-7 inline-block flex-none",
         inline_3xl: "h-10 w-10 inline-block flex-none",
     }[variant])
