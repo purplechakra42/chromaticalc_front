@@ -25,7 +25,7 @@
     ].filter(Boolean).join(" "))
 </script>
 
-<button class="w-full flex flex-col md:flex-row gap-1 md:gap-[1ch] p-[1ch] items-center rounded-lg border {corruptedFormatting} bg-dark-900 text-white {onclick ? "cursor-pointer" : ""}" {onclick} >
+<button class="w-full flex flex-col md:flex-row gap-1 md:gap-[1ch] p-[1ch] items-center rounded-3xl border {corruptedFormatting} bg-dark-900 text-white {onclick ? "cursor-pointer" : ""}" {onclick} >
     {#if !modifier && !vaal}
         <Icon itemIdentifier={basepic} />
     {:else}

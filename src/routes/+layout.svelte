@@ -67,13 +67,13 @@
 	import { pages } from '$lib/pages.js';
 	let showcurrencies = $state(false)
 	
-  // finish adding links to home page
-  // move sidebar to drop thing? how handle on mobile (back to main page, dropdown? prob drop)
+	let showNavDrop = $state(false)
+	// move sidebar to drop thing? how handle on mobile (back to main page, dropdown? prob drop)
 </script>
 
 <div id="content" class="min-h-screen bg-dark-950 text-white">
 	<header class="flex-none fixed py-1 px-3 min-w-full bg-dark-800 border-b border-dark-700 flex justify-end items-center gap-4 z-10">
-		<a href="/" class="mr-auto"><img class="rounded-full border border-dark-700 h-12 md:ml-1" src="/logo2.png" alt="logo" /></a>
+		<a href="/" class="mr-auto"><img class="rounded-full h-12 md:ml-1 border {page.url.pathname == "/" ? "border-dark-500" : "border-dark-700"}" src="/logo2.png" alt="logo" /></a>
 		<select bind:value={currentLeagueID} class="p-1.75 rounded-lg border border-dark-700 hover:bg-dark-700 hover:border-dark-600" aria-label="Select League">
 			{#each leaguesTrade as league}
 				<option value={league.id}>{league.name}</option>
@@ -93,7 +93,7 @@
 		{/if}
 	</header>
 
-	<nav class="hidden md:flex flex-col fixed top-17 left-2 w-16 rounded-full border border-dark-800 bg-dark-900 p-2 gap-2 justify-start-safe items-center z-10">
+	<nav class="{showNavDrop ? "flex" : "hidden md:flex"} flex-col fixed top-17 left-2 w-16 rounded-full border border-dark-800 bg-dark-900 p-2 gap-2 justify-start-safe items-center z-10">
 		{#each pages as page}
 			{#if page.name == 'ChromatiCalc'}
 				<NavBarElement href={page.href} icon={page.icon} onclick={() => resetChromatiCalc()} />
