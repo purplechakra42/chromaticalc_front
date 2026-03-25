@@ -16,20 +16,20 @@ pages.push(new Page(
     'Chromatic Orb',
     ["Chromatic Orb", "Jeweller's Orb", "Vaal Orb", "Tainted Chromatic Orb", "Omen of Blanching", "sacred-lifeforce", "wild-lifeforce"]
 ))
-// pages.push(new Page(
-//     'SocketCalc',
-//     '/socketcalc',
-//     'Find the cheapest way to 6-socket or 6-link an item.',
-//     'Orb of Fusing',
-//     ["Jeweller's Orb", "Orb of Fusing", "Vaal Orb", "Tainted Jeweller's Orb", "Tainted Orb of Fusing"]
-// ))
-// pages.push(new Page(
-//     'ConflictCalc',
-//     '/conflictcalc',
-//     'Calculate the cheapest way to elevate eldritch implicits.',
-//     'Orb of Conflict',
-//     ["Orb of Conflict", "Lesser Eldritch Ichor", "Greater Eldritch Ichor", "Grand Eldritch Ichor", "Exceptional Eldritch Ichor", "Lesser Eldritch Ember", "Greater Eldritch Ember", "Grand Eldritch Ember", "Exceptional Eldritch Ember"]
-// ))
+pages.push(new Page(
+    'SocketCalc',
+    '/socketcalc',
+    'Find the cheapest way to 6-socket or 6-link an item.',
+    'Orb of Fusing',
+    ["Jeweller's Orb", "Orb of Fusing", "Vaal Orb", "Tainted Jeweller's Orb", "Tainted Orb of Fusing"]
+))
+pages.push(new Page(
+    'ConflictCalc',
+    '/conflictcalc',
+    'Calculate the cheapest way to elevate eldritch implicits.',
+    'Orb of Conflict',
+    ["Orb of Conflict", "Lesser Eldritch Ichor", "Greater Eldritch Ichor", "Grand Eldritch Ichor", "Exceptional Eldritch Ichor", "Lesser Eldritch Ember", "Greater Eldritch Ember", "Grand Eldritch Ember", "Exceptional Eldritch Ember"]
+))
 // pages.push(new Page(
 //     'CooldownCalc',
 //     '/cooldowncalc',

@@ -134,7 +134,7 @@
     return priceArr.sort((a,b) => a[0]-b[0])
   })
 
-  // change reset function to add a new state
+  // change reset function to add a new state (for navigation)
   // mess up 6l warning on jeweller?
   
   // discoverability of dropdowns

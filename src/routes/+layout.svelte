@@ -68,6 +68,8 @@
 	let showcurrencies = $state(false)
 	
 	let showNavDrop = $state(false)
+
+	// add sveltehead to here instead of page
 	// how handle navbar on mobile (back to main page, or dropdown?)
 </script>
 
@@ -103,7 +105,7 @@
 		{/each}
 	</nav>
 	
-	<main class="flex flex-col md:pt-24 pt-18 min-h-screen w-9/10 md:w-6/10 mx-auto">
+	<main class="flex flex-col md:pt-24 pt-20 min-h-screen w-9/10 md:w-6/10 mx-auto">
 		{@render children()}
 		<footer class="mt-auto flex-none p-2">
 			<p class="text-dark-700 text-center">This tool isn't affiliated with or endorsed by Grinding Gear Games in any way.</p>

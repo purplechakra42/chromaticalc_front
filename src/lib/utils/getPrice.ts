@@ -2,7 +2,7 @@ import { getDATA, getLEAGUES } from "$lib/context"
 type Cost = [string, number]
 
 export function getPrice({ costs, format="cd" }: {
-        costs: [string, number][],
+        costs: Cost[],
         format?: 'c' | 'd' | 'cd', // chaos, divines, or both (switching at 1d)
     }): [number, string] {
     let leagues = getLEAGUES()
