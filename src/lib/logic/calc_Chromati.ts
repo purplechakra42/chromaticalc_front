@@ -1,13 +1,9 @@
-import type { Colours } from './colours.svelte';
-import { MAX_SOCKETS, recipesChromes, recipesSockets, MIN_OFF_COLOUR_CHANCE, MAGIC_PARAM_1, MAGIC_PARAM_2, blanchingOdds } from './constants';
-import { oneSocketJumpInformation, nSocketJumpInformation } from "./constants"
-import type { Requirements } from './requirements.svelte';
-// for code
-let f = [1, 1] // factorial memoisation
+import * as help from './calc_helpers'
 
-export function testfun(colours:any): number[] {
-    return colours.rgb
-}
+import { MAX_SOCKETS, recipesChromes, recipesSockets, MIN_OFF_COLOUR_CHANCE, MAGIC_PARAM_1, MAGIC_PARAM_2, blanchingOdds } from './constants';
+import { oneSocketRerollInformation, nSocketRerollInformation } from "./constants"
+import type { Requirements } from './requirements.svelte';
+import type { Colours } from './colours.svelte';
 
 /**
  * Checks whether there is enough data to calculate colouring costs.
@@ -15,7 +11,7 @@ export function testfun(colours:any): number[] {
 export function checkAllRequirements(colours: Colours, requirements: Requirements): string {
     try {
         if (colours.r < 0 || colours.g < 0 || colours.b < 0 || colours.u < 0) {
-            throw new Error(`Fixed socket value too low! Input had ${arrayToRGB(colours.rgb)} fixed sockets with ${colours.u} unfixed.`)
+            throw new Error(`Fixed socket value too low! Input had ${help.arrayToRGB(colours.rgb)} fixed sockets with ${colours.u} unfixed.`)
         }
         if (requirements.str < 0 || requirements.dex < 0 || requirements.int < 0) {
             throw new Error(`Stat requirement too low! Input had ${requirements.str}, ${requirements.dex} ${requirements.int} requirements.`)
@@ -45,7 +41,7 @@ export function calculateColoursBench(colours: Colours, requirements: Requiremen
     let out: [number, number[], number][] = []
 
     for (const [i, recipe] of recipesChromes.entries()) {
-        const remainingSockets = subtractTwoArrays(colours.rgb, recipe.slice(0,3))
+        const remainingSockets = help.subtractTwoArrays(colours.rgb, recipe.slice(0,3))
         if (remainingSockets.every(n => n>=0)) { // if the recipe can give a desired output
             let probability = multinomialWithUnfixedSockets(colours.u, remainingSockets, requirements.allProb)
             probability /= i == 0 ? 1-calculateChromaticBonus(colours.total, colours.rgb, requirements.allProb) : 1 // adjust chromatic orb chances
@@ -63,10 +59,10 @@ export function calculateColoursJeweller(colours: Colours, requirements: Require
 
     for (const [i, recipe] of recipesChromes.entries()) {
         if (i==0) { continue } // to reduce complexity, manually chroming to start is not considered (if the jeweller method is cheaper, it's unlikely that your chrome odds are good anyway)
-        const remainingSockets = subtractTwoArrays(colours.rgb, recipe.slice(0,3))
+        const remainingSockets = help.subtractTwoArrays(colours.rgb, recipe.slice(0,3))
         if (remainingSockets.every(n => n>=0)) { // if the recipe can give a desired output
-            let startingSockets = sumOfElements(recipe.slice(0,3))
-            if (startingSockets >= 2) { // need to start with at least 2 sockets, because! we can't jump back down to 1
+            let startingSockets = help.sumOfElements(recipe.slice(0,3))
+            if (startingSockets >= 2) { // need to start with at least 2 sockets, because! we can't craft 1 socket on bench
                 const startingTree: JewellerTree = {
                     [startingSockets]: [{
                         state: recipe.slice(0,3),
@@ -102,10 +98,10 @@ export function calculateColoursBlanching(colours: Colours, requirements: Requir
             blanChance += blanchingOdds[i] * multinomialWithUnfixedSockets(colours.u, colours.rgb, requirements.allProb)
         } else if ( colours.w < i+1 ) { // if we are getting more whites than we need
             // generate all combinations of which sockets the whites can replace
-            let combinations = flattenCombinations(generateCombinations((i+1) - colours.w, 3))
+            let combinations = help.flattenCombinations(help.generateCombinations((i+1) - colours.w, 3))
             // calculate the odds to get each combination that can still give the desired result (e.g. don't generate odds for (2W)2R if we want 1R3G)
             for (let combination of combinations) {
-                const remainingSockets = subtractTwoArrays(colours.rgb, combination.slice(0,3))
+                const remainingSockets = help.subtractTwoArrays(colours.rgb, combination.slice(0,3))
                 if (remainingSockets.every(n => n>=0)) { // if the combination can give a desired output
                     // don't bother with the chromaticBonus - depending on how blanchings are implemented, the bonus might be diminished or even entirely absent, and I'd rather err on the side of caution
                     blanChance += blanchingOdds[i] * combination[3] * multinomialWithUnfixedSockets(colours.u, remainingSockets, requirements.allProb)
@@ -133,7 +129,7 @@ export function calculateBlanchingWhites(end: number, total: number): number {
     if (end > blanchingOdds.length) {
         return 1/blanchingOdds[blanchingOdds.length-1]
     } else {
-        return 1/(sumOfElements(blanchingOdds.slice(end-1, blanchingOdds.length)))
+        return 1/(help.sumOfElements(blanchingOdds.slice(end-1, blanchingOdds.length)))
     }
 }
 
@@ -151,7 +147,7 @@ export function calculateBlanchingWhites(end: number, total: number): number {
  * Full credit for the formulae and parameters goes to Siveran https://siveran.github.io/calc.html
  */
 export function requirementsToChances(requirements: number[]): number[] {
-    const sumOfRequirements = sumOfElements(requirements)
+    const sumOfRequirements = help.sumOfElements(requirements)
     const nonzeroRequirements = requirements.filter(req => req !== 0).length
 
     function requirementToChance(req: number): number {
@@ -191,10 +187,10 @@ export type JewellerTree = {
 // is it ever okay to go up by more than one socket at a time?
 //   not if at least 2 sockets are fixed, because then it's cheaper to just do them one at a time (if the socket recipes didn't increase in cost so fast it might be okay).
 //   as far as I can intuit/hand calculate, there aren't any exceptions with two fixed sockets (imagine 002 -> 222 and red/green have high odds, still not worth). I haven't done an exhaustive search though.
-//   however, if only one of the sockets is fixed, there are probability thresholds where it's okay. stored in nSocketJumpInformation.
+//   however, if only one of the sockets is fixed, there are probability thresholds where it's okay. stored in nSocketRerollInformation.
 // is it ever okay to keep a more common colour to avoid the cost of rerolling for a rarer one?
 //   yes, sometimes. look at the cost of rolling for the rarer one with the more expensive crafts, vs rerolling this one and then getting the more common one with the more expensive crafts
-//   stored in oneSocketJumpInformation. hitting these ratios between the offcolour and one oncolour is only possible on Scourged items as of 3.27.
+//   stored in oneSocketRerollInformation. hitting these ratios between the offcolour and one oncolour is only possible on Scourged items as of 3.27.
 //   however, with two oncolours that have similar but non-identical stat requirements, these ratios are possible (some body armours, maybe some uniques (I assume akoya's and charlatan but odds 3 different reqs is untested))
 // is it ever okay to keep a socket that we only want 1 of, if there's another colour we want 2 or more of?
 //   as just calculated, if the 1 socket is rare enough, then no. 
@@ -202,22 +198,22 @@ export type JewellerTree = {
 function generateJewellerTree(fixedColours: number[], colourChances: number[], currentSocketNum: number, jewellerTree: JewellerTree): JewellerTree {
     // strategy: create a tree, where each node is a viable socket combination holding its overall probability to reach + the average cost to reach it
     // then, the final cost will be stored in the ending node, AND we can parse the tree to get the instructions to display
-    if (currentSocketNum == MAX_SOCKETS || currentSocketNum == sumOfElements(fixedColours)) { // base case
+    if (currentSocketNum == MAX_SOCKETS || currentSocketNum == help.sumOfElements(fixedColours)) { // base case
         return jewellerTree
     }
     // recursive case
     jewellerTree[currentSocketNum+1] = []
     for (const startingState of jewellerTree[currentSocketNum]) {
         // generate all possible next states from this state
-        let viableSockets = listViableSockets(subtractTwoArrays(fixedColours, startingState.state), colourChances, currentSocketNum)
+        let viableSockets = listViableSockets(help.subtractTwoArrays(fixedColours, startingState.state), colourChances, currentSocketNum)
         let viableChances = viableSockets.map((socket, j) => socket > 0 ? colourChances[j] : 0)
-        let viableChancesSum = sumOfElements(viableChances)
+        let viableChancesSum = help.sumOfElements(viableChances)
         for (const [i, viable] of viableSockets.entries()) {
             if (viable > 0) {
-                let newState = addValueToOneElement(startingState.state, viable, i) // add one to the current state to get the next state
+                let newState = help.addValueToOneElement(startingState.state, viable, i) // add one to the current state to get the next state
                 startingState.nextStates.push(newState)
                 // add the next state as one of the next options in the tree, if it isn't already in there
-                if (!jewellerTree[currentSocketNum+1].some(item => checkArrayEquality(item.state, newState))) {
+                if (!jewellerTree[currentSocketNum+1].some(item => help.checkArrayEquality(item.state, newState))) {
                     jewellerTree[currentSocketNum+1].push({
                         state: newState,
                         probability: 0,
@@ -238,7 +234,7 @@ function generateJewellerTree(fixedColours: number[], colourChances: number[], c
                 // add the contribution from the current > next state, into the next states' cost and incoming probability
                 // console.log(probIncomingTEMP, costTEMP, '\n')
                 for (let nextState of jewellerTree[currentSocketNum+1]) {
-                    if (checkArrayEquality(nextState.state, newState)) {
+                    if (help.checkArrayEquality(nextState.state, newState)) {
                         nextState.probability += probIncomingTEMP
                         nextState.cost += costTEMP
                     }
@@ -253,7 +249,7 @@ function listViableSockets(fixedColours: number[], colourChances: number[], star
     const remainingFixed = fixedColours.filter(value => value > 0).length
     colourChances = colourChances.map((chance, j) => fixedColours[j] > 0 ? chance : 99) // if we don't need any more of a colour, don't consider its chances
     let minThreshold = Math.min(...colourChances) // find the sockets we're okay to keep on this step, and then...
-    minThreshold *= remainingFixed >= 2 ? oneSocketJumpInformation[startingSockets] : 1 // ...if we're doing more than one, we need to check if keeping a common one is better
+    minThreshold *= remainingFixed >= 2 ? oneSocketRerollInformation[startingSockets] : 1 // ...if we're doing more than one, we need to check if keeping a common one is better
 
     let viableSockets = [0,0,0]
     for (let [j, colour] of fixedColours.entries()) {
@@ -288,7 +284,7 @@ export function parseJewellerTree(tree: JewellerTree, colours: Colours): Instruc
             for (let state of tree[Number(socknum)]) {
                 stateListTemp.push(state.state.slice(0,3))
             }
-            instructionList.push([`Reroll the ${socknum}${getOrdinalSuffix(parseInt(socknum))} socket until your colours are`, stateListTemp])
+            instructionList.push([`Reroll the ${socknum}${help.getOrdinalSuffix(parseInt(socknum))} socket until your colours are`, stateListTemp])
             stateListTemp = []
         }
     }
@@ -307,9 +303,9 @@ function multinomialWithUnfixedSockets(unfixedSockets: number, fixedSockets: num
         //   to do this, we give the colours an order, and say that you can't go backwards in that order
         //   example: we can add a red socket, then a green socket, but then we can't add a red socket again (because that would be RGR, and RRG is already handling it)
         return(
-            (orderingIndex <= 0 ? multinomialWithUnfixedSockets(unfixedSockets-1, addValueToOneElement(fixedSockets, 1, 0), colourChances, 0) : 0)
-            + (orderingIndex <= 1 ? multinomialWithUnfixedSockets(unfixedSockets-1, addValueToOneElement(fixedSockets, 1, 1), colourChances, 1) : 0)
-            + multinomialWithUnfixedSockets(unfixedSockets-1, addValueToOneElement(fixedSockets, 1, 2), colourChances, 2)
+            (orderingIndex <= 0 ? multinomialWithUnfixedSockets(unfixedSockets-1, help.addValueToOneElement(fixedSockets, 1, 0), colourChances, 0) : 0)
+            + (orderingIndex <= 1 ? multinomialWithUnfixedSockets(unfixedSockets-1, help.addValueToOneElement(fixedSockets, 1, 1), colourChances, 1) : 0)
+            + multinomialWithUnfixedSockets(unfixedSockets-1, help.addValueToOneElement(fixedSockets, 1, 2), colourChances, 2)
         )
     }
 }
@@ -317,7 +313,7 @@ function multinomialWithUnfixedSockets(unfixedSockets: number, fixedSockets: num
 function multinomial(fixedColours: number[], colourChances: number[]): number {
     let [red, green, blue] = fixedColours
     let [str, dex, int] = colourChances
-    return factorial(red+green+blue)/(factorial(red) * factorial(green) * factorial(blue)) * Math.pow(str, red) * Math.pow(dex, green) * Math.pow(int, blue)
+    return help.factorial(red+green+blue)/(help.factorial(red) * help.factorial(green) * help.factorial(blue)) * Math.pow(str, red) * Math.pow(dex, green) * Math.pow(int, blue)
 }
 
 // similar to multinomialWithUnfixedSockets, but when we get to the base case, we find the likelihood that it gets rolled TWICE, not just rolled
@@ -330,9 +326,9 @@ function calculateChromaticBonus(unfixedSockets: number, fixedSockets: number[],
         return(multinomialTwice(currentSockets, colourChances))
     } else {
         return(
-            (orderingIndex <= 0 ? calculateChromaticBonus(unfixedSockets-1, fixedSockets, colourChances, addValueToOneElement(currentSockets, 1, 0), 0) : 0)
-            + (orderingIndex <= 1 ? calculateChromaticBonus(unfixedSockets-1, fixedSockets, colourChances, addValueToOneElement(currentSockets, 1, 1), 1) : 0)
-            + calculateChromaticBonus(unfixedSockets-1, fixedSockets, colourChances, addValueToOneElement(currentSockets, 1, 2), 2)
+            (orderingIndex <= 0 ? calculateChromaticBonus(unfixedSockets-1, fixedSockets, colourChances, help.addValueToOneElement(currentSockets, 1, 0), 0) : 0)
+            + (orderingIndex <= 1 ? calculateChromaticBonus(unfixedSockets-1, fixedSockets, colourChances, help.addValueToOneElement(currentSockets, 1, 1), 1) : 0)
+            + calculateChromaticBonus(unfixedSockets-1, fixedSockets, colourChances, help.addValueToOneElement(currentSockets, 1, 2), 2)
         )
     }
 }
@@ -342,95 +338,6 @@ function multinomialTwice(currentSockets: number[], colourChances: number[]): nu
     let [str, dex, int] = colourChances
     // this is just the multinomial distribution formula, but with the chance to roll the combination twice in a row instead of once (that's what the *2s are for)
     // since each permutation of the same combination has the same chance, we keep the adjustment coefficient in the multinomial
-    return factorial(red+green+blue)/(factorial(red) * factorial(green) * factorial(blue)) * Math.pow(str, red*2) * Math.pow(dex, green*2) * Math.pow(int, blue*2)
+    return help.factorial(red+green+blue)/(help.factorial(red) * help.factorial(green) * help.factorial(blue)) * Math.pow(str, red*2) * Math.pow(dex, green*2) * Math.pow(int, blue*2)
 }
 
-
-function factorial(num: number): number {
-    if (f[num] !== undefined) {
-        return(f[num])
-    } else {
-        return(f[num] = num * factorial(num-1))
-    }
-}
-export function arrayToRGB(array: number[]): string {
-    if (checkArrayEquality(array, [0,0,0])) {
-        return 'Chromatic (No Bench)'
-    } else {
-        return `${array[0] ? `${array[0]}R` : ""}${array[1] ? `${array[1]}G` : ""}${array[2] ? `${array[2]}B` : ""}`
-    }
-}
-function generateCombinations(total: number, length: number): number[][] {
-    // generate all possible combinations of Total choices spread out across Length options. will contain duplicates
-    let out = []
-    for (let i = 0; i < length; i++) {
-        let tempout = constructSingleValueArray(1,i,length)
-        if (total > 1) {
-            for (const array of generateCombinations(total-1,length)) {
-                out.push(addTwoArrays(tempout,array))
-            }
-        } else {
-            out.push(tempout)
-        }
-    }
-    return out
-}
-function flattenCombinations(combinations: number[][]): number[][] {
-    // collect all duplicate combinations, and calculate its chances of appearing based on the number of duplicates
-    const total = combinations.length
-    let out: number[][] = []
-    for (const combination of combinations) {
-        if (!out.some(item => checkArrayEquality(item.slice(0,3), combination))) {
-            out.push([...combination,0])
-        }
-        let idxOfComb = out.findIndex((item => checkArrayEquality(item.slice(0,3),combination)))
-        out[idxOfComb][3] += 1/total
-    }
-    return out
-}
-function getOrdinalSuffix(num: number): string {
-    switch (num) {
-        case 1: return 'st'
-        case 2: return 'nd'
-        case 3: return 'rd'
-    }
-    return 'th'
-}
-function nullToZero(array: (number | null)[]): number[] {
-    return array.map(value => value ?? 0)
-}
-export function sumOfElements(array: number[]): number {
-    return array.reduce((runningTotal,currentElement) => runningTotal + currentElement, 0)  
-}
-function addTwoArrays(base: number[], addor: number[]): number[] {
-    if (base.length != addor.length) {
-        throw Error('adding arrays with different lengths')
-    }
-    return base.map((num, idx) => num + addor[idx])
-}
-function subtractTwoArrays(base: number[], subtractor: number[]): number[] {
-    if (base.length != subtractor.length) {
-        throw Error('subtracting arrays with different lengths')
-    }
-    return base.map((num, idx) => num - subtractor[idx])
-}
-function constructSingleValueArray(value: number, index: number, length: number): number[] {
-    let outArray = new Array(length)
-    outArray.fill(0)
-    outArray[index] = value
-    return outArray
-}
-function addValueToOneElement(base: number[], value: number, index: number): number[] {
-    return addTwoArrays(base, constructSingleValueArray(value, index, base.length))
-}
-export function checkArrayEquality(arr1: number[], arr2: number[]): boolean {
-    if (arr1.length != arr2.length) {
-        throw Error('comparing arrays with different lengths')
-    }
-    for (let [i, element] of arr1.entries()) {
-        if (element != arr2[i]) {
-            return false
-        }
-    }
-    return true
-}

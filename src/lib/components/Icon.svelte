@@ -3,9 +3,10 @@
     let leagues = getLEAGUES()
     let costsAndItems = getDATA()
     
-    let { itemIdentifier, variant="base" }: {
+    let { itemIdentifier, variant="base", centered=false }: {
         itemIdentifier: string,
         variant?: "base" | "modifier" | "nav_inactive" | "nav_active" | "inline" | "inline_3xl",
+        centered?: boolean,
     } = $props()
     
     let variantStyling = $derived({
@@ -22,7 +23,7 @@
 </script>
 
 {#if !leagues.loading && itemInfo}
-    <img class="{variantStyling}" src={`https://web.poecdn.com${itemInfo?.image}`} alt={`${itemInfo.name}${variant=="modifier" ? " (Modifier)" : ""}`} />
+    <img class="{variantStyling} {centered?"mx-auto":""}" src={`https://web.poecdn.com${itemInfo?.image}`} alt={`${itemInfo.name}${variant=="modifier" ? " (Modifier)" : ""}`} />
 {:else}
-    <div class="{variantStyling} bg-linear-to-r from-dark-800 to-dark-900 rounded-full"></div>
+    <div class="{variantStyling} {centered?"mx-auto":""} bg-linear-to-r from-dark-800 to-dark-900 rounded-full"></div>
 {/if}

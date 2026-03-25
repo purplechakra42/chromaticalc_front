@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { replaceState } from '$app/navigation';
-	import { onMount, tick, untrack } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { decodeParams, encodeParams } from '$lib/utils/chromaticalcParams';
 
   // import { oneSocketJumpInformation, nSocketJumpInformation } from "$lib/logic/constants"
 	import { blanchingOdds, recipesSockets } from '$lib/logic/constants';
 
-  import { checkAllRequirements, calculateColoursBench, calculateColoursJeweller, calculateColoursTaintedChrome, calculateColoursBlanching } from '$lib/logic/calc'
-  import { calculateHarvestWhites, calculateBlanchingWhites } from '$lib/logic/calc'
-  import { parseJewellerTree, arrayToRGB, sumOfElements } from '$lib/logic/calc'
+  import { arrayToRGB, getOrdinalSuffix, sumOfElements } from '$lib/logic/calc_helpers'
+  import { checkAllRequirements, parseJewellerTree } from '$lib/logic/calc_Chromati'
+  import { calculateColoursBench, calculateColoursJeweller, calculateColoursTaintedChrome, calculateColoursBlanching, calculateHarvestWhites, calculateBlanchingWhites } from '$lib/logic/calc_Chromati'
+  import type { Instruction } from '$lib/logic/calc_Chromati';
   type Cost = [string, number]
-  import type { Instruction } from '$lib/logic/calc';
   
   import IconCosts from '$lib/components/IconCosts.svelte';
   import InlineRGB from '$lib/components/InlineRGB.svelte';
@@ -72,12 +72,13 @@
   })
   // jeweller method
   let infoJeweller = $derived.by(() => {
+    const fakeinfos = { infos: false, recipe: [0,0,0,0], start: 0, instructions: [['',[]]] as Instruction[], costJeweller: 0, costs: [] }
     if (ready !== "Ready" || colours.total == 1 || colours.w > 0) { // we can't jump down to 1 socket (and it's equivalent to the chromatic option anyway)
-      return { infos: false, recipe: [0,0,0,0], start: 0, instructions: [['',[]]] as Instruction[], costJeweller: 0, costs: [] }
+      return fakeinfos
     }
 
     let [trees, startingRecipes] = calculateColoursJeweller(colours, requirements)
-    if (trees.length==0) { return { infos: false, recipe: [0,0,0,0], start: 0, instructions: [['',[]]] as Instruction[], costJeweller: 0, costs: [] } }
+    if (trees.length==0) { return fakeinfos }
 
     let bestTreeInfo = {tree: trees[0], startingRecipe: startingRecipes[0], costArr: [] as Cost[], cost: 0}
     for (const [i, tree] of trees.entries()) {
@@ -133,6 +134,7 @@
     return priceArr.sort((a,b) => a[0]-b[0])
   })
 
+  // change reset function to add a new state
   // mess up 6l warning on jeweller?
   
   // discoverability of dropdowns
@@ -150,14 +152,14 @@
   <link rel="icon" href="/Chromatic_Orb.png" />
 </svelte:head>
 
-<div class="flex flex-col w-9/10 md:w-6/10 mx-auto gap-3 md:text-lg">
-  <h1 class="text-5xl text-center font-bold {ready=="Ready" ? "text-green-300" : ""} pb-4">ChromatiCalc.</h1>
+<div class="flex flex-col w-full gap-3 md:text-lg">
+  <h1 class="text-5xl text-center font-bold {ready=="Ready" ? "text-green-200" : ""} md:pb-4">ChromatiCalc.</h1>
 
   <div class="w-full grid grid-flow-row grid-cols-[2fr_2fr_2fr_1fr_auto_1fr] grid-rows-[3fr_2fr_3fr] gap-2 pb-2">
     <InputColour colour="red" name="STR" bind:value={requirements.strRaw} />
     <InputColour colour="green" name="DEX" bind:value={requirements.dexRaw} />
     <InputColour colour="blue" name="INT" bind:value={requirements.intRaw} />
-    <button class="cursor-pointer rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90 {corrupted.corrupted?"border border-red-900":''}" style="background-image: url({icon})" onclick={() => corrupted.corrupted = !corrupted.corrupted} aria-label="toggle corrupted"></button>
+    <button class="cursor-pointer rounded-3xl col-span-3 row-span-2 bg-cover bg-center bg-no-repeat opacity-90 {corrupted.corrupted?"border-y border-red-900":''}" style="background-image: url({icon})" onclick={() => corrupted.corrupted = !corrupted.corrupted} aria-label="toggle corrupted"></button>
 
     {#each requirements.allProb as chance}
       <p class="text-center text-small text-dark-600">{(chance*100).toLocaleString(undefined,{maximumFractionDigits:1})+"%"}</p>
@@ -190,7 +192,7 @@
         </span>
         {#each infoChromatic.infos as infoBench, i}
           <span class="w-full p-0.5 inline-grid grid-cols-4 
-              {infoChromatic.costs.indexOf(infoChromatic.costMin) == i ? "font-bold bg-dark-800 rounded-md border-y border-y-blue-200!" : "bg-dark-950 "}
+              {infoChromatic.costs.indexOf(infoChromatic.costMin) == i ? "font-bold bg-dark-900 rounded-md border-y border-y-blue-200!" : "bg-dark-950 "}
               {infoChromatic.costs.indexOf(infoChromatic.costMin)+1 == i ? "" : "border-t-dark-800 border-t"}
               {infoChromatic.costs.length-1 == i ? "border-b-dark-800 border-b rounded-b-3xl" : ""} ">
             <InlineRGB rgb={infoBench[1]} printchrome={true} alignment="centered" />

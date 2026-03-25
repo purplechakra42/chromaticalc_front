@@ -1,4 +1,4 @@
-import { requirementsToChances } from "./calc"
+import { requirementsToChances } from "./calc_Chromati"
 
 export class Requirements {
     strRaw = $state<number|null>(null)

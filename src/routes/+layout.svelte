@@ -68,24 +68,24 @@
 	let showcurrencies = $state(false)
 	
 	let showNavDrop = $state(false)
-	// move sidebar to drop thing? how handle on mobile (back to main page, dropdown? prob drop)
+	// how handle navbar on mobile (back to main page, or dropdown?)
 </script>
 
 <div id="content" class="min-h-screen bg-dark-950 text-white">
 	<header class="flex-none fixed py-1 px-3 min-w-full bg-dark-800 border-b border-dark-700 flex justify-end items-center gap-4 z-10">
 		<a href="/" class="mr-auto"><img class="rounded-full h-12 md:ml-1 border {page.url.pathname == "/" ? "border-dark-500" : "border-dark-700"}" src="/logo2.png" alt="logo" /></a>
-		<select bind:value={currentLeagueID} class="p-1.75 rounded-lg border border-dark-700 hover:bg-dark-700 hover:border-dark-600" aria-label="Select League">
+		<select bind:value={currentLeagueID} class="p-1.75 rounded-lg border-y border-dark-700 hover:bg-dark-700 hover:border-dark-600" aria-label="Select League">
 			{#each leaguesTrade as league}
 				<option value={league.id}>{league.name}</option>
 			{/each}
 		</select>
 
-		<div class="rounded-lg border border-dark-700 hover:bg-dark-700 hover:border-dark-600" role="status" onmouseenter={() => showcurrencies=true} onmouseleave={() => showcurrencies=false}>
+		<div class="rounded-lg border-y border-dark-700 hover:bg-dark-700 hover:border-dark-600" role="status" onmouseenter={() => showcurrencies=true} onmouseleave={() => showcurrencies=false}>
 			<IconPricedRatio left="divine"/>
 		</div>
 
 		{#if showcurrencies}
-			<div class="absolute top-12 rounded-lg border bg-dark-800 border-dark-700 z-10">
+			<div class="absolute top-12 rounded-lg border-y bg-dark-800 border-dark-700 z-10">
 				{#each pages.find((pg) => pg.href == page.url.pathname)?.displayCurrencies as curr}
 				<IconPricedRatio left={curr}/>
 				{/each}
@@ -103,7 +103,7 @@
 		{/each}
 	</nav>
 	
-	<main class="flex flex-col md:pt-24 pt-18 min-h-screen">
+	<main class="flex flex-col md:pt-24 pt-18 min-h-screen w-9/10 md:w-6/10 mx-auto">
 		{@render children()}
 		<footer class="mt-auto flex-none p-2">
 			<p class="text-dark-700 text-center">This tool isn't affiliated with or endorsed by Grinding Gear Games in any way.</p>
