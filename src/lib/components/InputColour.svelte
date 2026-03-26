@@ -18,4 +18,4 @@
     const hideSpinners = "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 </script>
 
-<input class="w-full border-y rounded-xl {"bg-linear-to-r from-0% via-[percentage:10%_90%] to-100% " + colourVariants[colour]} font-bold text-center {hideSpinners}" type="number" bind:value {name} min={min} max={max} placeholder={placeholder ?? name} />
+<input class="w-full border-y rounded-xl {"bg-linear-to-r from-0% via-[percentage:10%_90%] to-100% " + colourVariants[colour]} font-bold text-center placeholder:opacity-50 {hideSpinners}" type="number" bind:value {name} min={min} max={max} placeholder={placeholder ?? name} />

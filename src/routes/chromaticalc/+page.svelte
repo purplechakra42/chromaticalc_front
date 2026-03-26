@@ -135,7 +135,6 @@
   })
 
   // change reset function to add a new state (for navigation)
-  // mess up 6l warning on jeweller?
   
   // discoverability of dropdowns
   // tooltip for U/W box
@@ -209,8 +208,14 @@
     <div style="order: {sortArr.findIndex(elem => elem[1] == 1)}" class="">
       <DisplayOption basepic="Jeweller's Orb" text={'Jeweller Method'} costs={infoJeweller.costs} strong={showJeweller} vaal={corrupted.corrupted} onclick={()=>showJeweller=!showJeweller} />
       {#if showJeweller}
+        {#if colours.total == 6}
+          <span class="w-full px-0.5 py-1 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] text-dark-300 bg-dark-950 border-t-dark-800 border-t rounded-t-3xl">
+            <p class="italic text-right">Warning:</p>
+            <p class="text-wrap text-left">This method will break your 6-link if you have it!</p>
+          </span>
+        {/if}
         {#each infoJeweller.instructions as instruction, i}
-          <span class="w-full px-0.5 py-1 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] bg-dark-950 border-t-dark-800 border-t {0 == i ? "rounded-t-3xl" : ""}">
+          <span class="w-full px-0.5 py-1 md:px-10 inline-grid grid-cols-[7ch_1fr] gap-[1ch] bg-dark-950 border-t-dark-800 border-t {0 == i && colours.total !== 6 ? "rounded-t-3xl" : ""}">
             <p class="italic text-right">Step {i+1}:</p>
             <span class="inline-flex">
               <p class="text-wrap text-left">{@html instruction[0]}</p>
